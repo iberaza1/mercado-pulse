@@ -24,3 +24,5 @@ A fun hobby dashboard by [@Chicano_Ismael](https://x.com/Chicano_Ismael) (Yukon,
 - **SAMPLE:** Options, bank stocks, bonds and macro numbers are made-up practice values, clearly labeled on the site.
 
 Built with help from Grok Bot. *For fun & learning only — not investment advice.*
+
+Auto-deploys from GitHub via Vercel.
