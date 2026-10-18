@@ -1,0 +1,8 @@
+{
+  "name": "mercado-pulse",
+  "private": true,
+  "description": "Mercado Pulse - Ismael's finance hobby dashboard",
+  "dependencies": {
+    "pdf-parse": "1.1.1"
+  }
+}

@@ -1,0 +1,75 @@
+/* ============================================================
+   MERCADO PULSE - styles (the LOOK)
+   Tip: change the colors in :root and the whole site updates!
+   ============================================================ */
+:root {
+  --bg: #0b0f17;        /* page background */
+  --card: #151b26;      /* card background */
+  --text: #e6e9ef;      /* main text */
+  --muted: #8a93a6;     /* gray helper text */
+  --accent: #22d3a6;    /* teal highlight */
+  --accent2: #f59e0b;   /* orange for SAMPLE */
+  --up: #22c55e;        /* green = went up */
+  --down: #ef4444;      /* red = went down */
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.5; }
+a { color: var(--accent); }
+
+/* Sticky nav that scrolls sideways on phones */
+.nav { position: sticky; top: 0; z-index: 10; display: flex; gap: 1rem; overflow-x: auto;
+  padding: .75rem 1rem; background: rgba(11,15,23,.92); backdrop-filter: blur(6px);
+  border-bottom: 1px solid #222a38; white-space: nowrap; }
+.nav a { text-decoration: none; color: var(--muted); font-weight: 600; }
+.nav a:hover { color: var(--accent); }
+
+.hero { padding: 2.5rem 1.25rem 1.5rem; text-align: center;
+  background: radial-gradient(circle at top, #123 0%, var(--bg) 70%); }
+.hero h1 { font-size: 2.6rem; margin: 0; letter-spacing: -1px; }
+.accent { color: var(--accent); }
+.tagline { color: var(--muted); max-width: 40rem; margin: .75rem auto; }
+.legend { font-size: .85rem; color: var(--muted); }
+
+main { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+.section { padding: 1.5rem 0; border-bottom: 1px solid #1d2432; }
+.section h2 { margin: 0 0 .25rem; font-size: 1.4rem; }
+.note { color: var(--muted); font-size: .9rem; margin-top: 0; }
+
+/* Mobile-first grid: 2 columns on phones, more on bigger screens */
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; margin: .75rem 0; }
+@media (min-width: 700px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+
+.card { background: var(--card); border: 1px solid #222a38; border-radius: 14px; padding: .9rem; }
+.card .label { color: var(--muted); font-size: .8rem; }
+.card .value { font-size: 1.35rem; font-weight: 700; }
+.card .sub { font-size: .8rem; color: var(--muted); }
+.up { color: var(--up); } .down { color: var(--down); }
+.chart-card { margin-top: .75rem; } .chart-card h3 { margin: 0 0 .5rem; font-size: 1rem; }
+.explain { margin-top: .75rem; font-size: .95rem; }
+
+.badge { font-size: .65rem; font-weight: 800; padding: .15rem .45rem; border-radius: 999px; vertical-align: middle; }
+.badge.live { background: var(--accent); color: #002b20; }
+.badge.sample { background: var(--accent2); color: #2b1a00; }
+
+/* Micro + story cards span full width */
+#micro-cards .card h3, .story h3 { margin: 0 0 .35rem; font-size: 1rem; color: var(--accent); }
+#micro-cards .card p { margin: 0; font-size: .9rem; }
+#micro-cards { grid-template-columns: 1fr; }
+@media (min-width: 700px) { #micro-cards { grid-template-columns: repeat(2, 1fr); } }
+.story { margin-bottom: .75rem; }
+.story .sides { display: grid; grid-template-columns: 1fr; gap: .5rem; margin-top: .5rem; }
+@media (min-width: 700px) { .story .sides { grid-template-columns: 1fr 1fr; } }
+.story .side { background: #0f141d; border-radius: 10px; padding: .6rem; font-size: .9rem; }
+.story .side b { display: block; margin-bottom: .2rem; }
+
+.footer { text-align: center; padding: 2rem 1rem; color: var(--muted); }
+.small { font-size: .8rem; }
+
+/* ----- Livestock table ----- */
+.mini { margin: 0 0 .5rem; font-size: 1rem; }
+.ls-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.ls-table th { text-align: left; color: var(--muted); font-weight: 600; padding: .3rem .2rem; border-bottom: 1px solid #222a38; }
+.ls-table td { padding: .35rem .2rem; border-bottom: 1px solid #1a2130; }
+.links { margin: .4rem 0 0; padding-left: 1.1rem; }
+.links li { margin: .25rem 0; }

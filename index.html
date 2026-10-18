@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     MERCADO PULSE - Ismael's finance hobby dashboard
+     This file is the STRUCTURE of the page (the "skeleton").
+     style.css = the LOOK.  app.js = the BEHAVIOR (data + charts).
+     ============================================================ -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- This line makes the page fit phone screens properly -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mercado Pulse 📈 | Markets x Politics</title>
+  <meta name="description" content="A fun hobby dashboard: options, FX, bank stocks, bonds, macro, micro and politics x markets." />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Chart.js draws our charts. Loaded from a free CDN. -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ===== TOP NAV: tap a word to jump to that section ===== -->
+  <nav class="nav">
+    <a href="#fx">FX</a><a href="#options">Options</a><a href="#banks">Banks</a>
+    <a href="#bonds">Bonds</a><a href="#macro">Macro</a><a href="#micro">Micro</a><a href="#politics">Politics</a><a href="#livestock">Livestock</a>
+  </nav>
+
+  <!-- ===== HERO (big title area) ===== -->
+  <header class="hero">
+    <h1>Mercado <span class="accent">Pulse</span></h1>
+    <p class="tagline">¿Qué onda con el mercado? Options, FX, bancos, bonds, macro &amp; micro — plus how politics moves money (y viceversa).</p>
+    <p class="legend"><span class="badge live">LIVE</span> real data from a free API &nbsp; <span class="badge sample">SAMPLE</span> made-up practice numbers</p>
+  </header>
+
+  <main>
+    <!-- ===== FX: this one is LIVE (frankfurter.app) ===== -->
+    <section id="fx" class="section">
+      <h2>💱 FX Currencies <span class="badge live">LIVE</span></h2>
+      <p class="note">Daily reference rates from the European Central Bank via frankfurter.app. <span id="fx-date"></span></p>
+      <div class="grid" id="fx-cards"><div class="card">Loading rates…</div></div>
+      <div class="card chart-card">
+        <h3>USD/MXN – last 30 days</h3>
+        <canvas id="fxChart"></canvas>
+      </div>
+    </section>
+
+    <!-- ===== OPTIONS (sample) ===== -->
+    <section id="options" class="section">
+      <h2>🎲 Options Market <span class="badge sample">SAMPLE</span></h2>
+      <p class="note">No free, key-less live source for these, so these are practice numbers — not today's market.</p>
+      <div class="grid" id="options-cards"></div>
+      <div class="card explain"><b>VIX = the "fear gauge."</b> It measures how much movement traders expect in the S&amp;P 500 over the next 30 days, based on option prices. Under ~15 = calm, over ~30 = pánico.</div>
+    </section>
+
+    <!-- ===== BANK STOCKS (sample) ===== -->
+    <section id="banks" class="section">
+      <h2>🏦 Banking Stocks <span class="badge sample">SAMPLE</span></h2>
+      <p class="note">Practice numbers. KBE = big + mid US banks ETF, KRE = regional banks ETF.</p>
+      <div class="grid" id="bank-cards"></div>
+    </section>
+
+    <!-- ===== BONDS (sample) ===== -->
+    <section id="bonds" class="section">
+      <h2>📜 Bonds &amp; Yield Curve <span class="badge sample">SAMPLE</span></h2>
+      <p class="note">Sample Treasury curve. When the 2Y yield is above the 10Y, the curve is "inverted" — often read as a recession warning.</p>
+      <div class="grid" id="bond-cards"></div>
+      <div class="card chart-card"><h3>Sample yield curve</h3><canvas id="curveChart"></canvas></div>
+    </section>
+
+    <!-- ===== MACRO (sample) ===== -->
+    <section id="macro" class="section">
+      <h2>🌎 Macro Economics <span class="badge sample">SAMPLE</span></h2>
+      <p class="note">Practice numbers. Real ones: BLS (CPI, jobs) and the Federal Reserve.</p>
+      <div class="grid" id="macro-cards"></div>
+    </section>
+
+    <!-- ===== MICRO explainer cards ===== -->
+    <section id="micro" class="section">
+      <h2>🧮 Micro Economics 101</h2>
+      <div class="grid" id="micro-cards"></div>
+    </section>
+
+    <!-- ===== POLITICS x MARKETS story cards ===== -->
+    <section id="politics" class="section">
+      <h2>🗳️ Politics x Markets</h2>
+      <p class="note">Educational examples showing both sides. Not predictions, not current events.</p>
+      <div id="story-cards"></div>
+    </section>
+    <!-- ===== LIVESTOCK: LIVE from USDA via our api/livestock.js helper ===== -->
+    <section id="livestock" class="section">
+      <h2>🐂 Livestock: OKC Stockyards <span class="badge live">LIVE</span></h2>
+      <p class="note">Oklahoma National Stockyards feeder cattle auction (weekly, Monday sale). Feeder steers, Medium &amp; Large 1, $ per cwt (100 lbs). <span id="ls-date"></span></p>
+      <div class="grid" id="ls-summary"><div class="card">Loading USDA report…</div></div>
+      <div class="card"><h3 class="mini">Steer prices by weight</h3>
+        <table class="ls-table"><thead><tr><th>Weight</th><th>Head</th><th>Range</th><th>Avg</th></tr></thead>
+        <tbody id="ls-rows"></tbody></table></div>
+      <div class="card explain" id="ls-comment"></div>
+      <div class="card explain"><b>Ag news &amp; reports (links):</b>
+        <ul class="links">
+          <li><a href="https://mymarketnews.ams.usda.gov/viewReport/1280" target="_blank" rel="noopener">USDA report 1280 – full OKC Stockyards report</a></li>
+          <li><a href="https://www.oklahomafarmreport.com/" target="_blank" rel="noopener">Oklahoma Farm Report (Ron Hays)</a></li>
+          <li><a href="https://www.onsy.com/" target="_blank" rel="noopener">Oklahoma National Stockyards</a></li>
+          <li><a href="https://extension.okstate.edu/programs/beef-extension/" target="_blank" rel="noopener">OSU Extension – Beef</a></li>
+        </ul></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Built by <a href="https://x.com/Chicano_Ismael" target="_blank" rel="noopener">@Chicano_Ismael</a> from Yukon, OK 🌾 — with help from Grok Bot.</p>
+    <p class="small">For fun &amp; learning only. Not investment advice. SAMPLE values are made up.</p>
+  </footer>
+
+  <!-- Our JavaScript goes last so the page above is ready first -->
+  <script src="app.js"></script>
+</body>
+</html>
