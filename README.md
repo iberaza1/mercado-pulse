@@ -11,7 +11,18 @@ A fun hobby dashboard by [@Chicano_Ismael](https://x.com/Chicano_Ismael) (Yukon,
 | `style.css` | The look (colors are at the top in `:root`) |
 | `app.js` | The behavior: sample data lists, live FX + livestock loading, charts |
 | `api/livestock.js` | Small Vercel serverless function that reads the USDA cattle report |
-| `package.json` | Lists the one library the function needs (`pdf-parse`) |
+| `package.json` | Lists the one library the function needs (`pdf-parse`) and the Node version (24.x) Vercel should use |
+| `package-lock.json` | Freezes the exact library versions so every deploy is the same (made by `npm install`, don't edit by hand) |
+| `vercel.json` | Security headers Vercel adds to every page (see below) |
+| `favicon.svg` | The little icon in the browser tab |
+
+## Security headers (`vercel.json`)
+JSON files can't hold comments, so here's what each one does:
+- **X-Content-Type-Options: nosniff** – browsers must trust our file types instead of guessing.
+- **Referrer-Policy** – other sites only see our domain, not the full page address, when someone clicks a link.
+- **X-Frame-Options: DENY** + `frame-ancestors 'none'` – nobody can embed our site inside theirs (stops "clickjacking").
+- **Permissions-Policy** – turns off camera, mic, location, payments, USB; we don't use them.
+- **Content-Security-Policy** – a list of the only places the page may load code/data from: our own site, Chart.js on `cdn.jsdelivr.net`, and FX rates from `api.frankfurter.dev`. **If you add a new outside API or script, add its address here too**, or the browser will block it.
 
 ## How to edit
 - **On a Chromebook / any browser:** open this repo on GitHub and press the **`.`** key → opens github.dev (VS Code in the browser). Edit, then commit.

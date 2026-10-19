@@ -32,7 +32,8 @@ a { color: var(--accent); }
 .legend { font-size: .85rem; color: var(--muted); }
 
 main { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
-.section { padding: 1.5rem 0; border-bottom: 1px solid #1d2432; }
+.section { padding: 1.5rem 0; border-bottom: 1px solid #1d2432;
+  scroll-margin-top: 3.5rem; } /* stops the sticky nav from covering the title when you tap a link */
 .section h2 { margin: 0 0 .25rem; font-size: 1.4rem; }
 .note { color: var(--muted); font-size: .9rem; margin-top: 0; }
 
@@ -48,7 +49,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
 .chart-card { margin-top: .75rem; } .chart-card h3 { margin: 0 0 .5rem; font-size: 1rem; }
 .explain { margin-top: .75rem; font-size: .95rem; }
 
-.badge { font-size: .65rem; font-weight: 800; padding: .15rem .45rem; border-radius: 999px; vertical-align: middle; }
+.badge { font-size: .75rem; /* was .65rem; a bit bigger = easier to read */
+  font-weight: 800; padding: .15rem .45rem; border-radius: 999px; vertical-align: middle; }
 .badge.live { background: var(--accent); color: #002b20; }
 .badge.sample { background: var(--accent2); color: #2b1a00; }
 
@@ -73,3 +75,7 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
 .ls-table td { padding: .35rem .2rem; border-bottom: 1px solid #1a2130; }
 .links { margin: .4rem 0 0; padding-left: 1.1rem; }
 .links li { margin: .25rem 0; }
+
+/* Text only screen readers hear (hidden on screen). Used for chart descriptions. */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

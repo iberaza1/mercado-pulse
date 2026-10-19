@@ -63,6 +63,8 @@ function card(label, value, sub, cls = "") {
 }
 
 // ---------- FILL SAMPLE SECTIONS ----------
+// innerHTML is OK here: these lists are written by us in this file,
+// not downloaded from the internet. Outside data uses el() below instead.
 function renderSamples() {
   document.getElementById("options-cards").innerHTML =
     optionsSample.map(o => card(o.label, o.value, o.sub)).join("");
@@ -105,6 +107,7 @@ async function loadFX() {
     const d = await res.json();
     document.getElementById("fx-date").textContent = `As of ${d.date}.`;
     const r = d.rates;
+    // Only numbers go in here (toFixed makes a number into digits), so innerHTML is safe.
     box.innerHTML =
       card("EUR/USD", (1 / r.EUR).toFixed(4), "dollars per euro") +
       card("USD/MXN", r.MXN.toFixed(3), "pesos per dollar 🇲🇽") +
@@ -123,7 +126,10 @@ async function loadFX() {
     const res = await fetch(`${API}/${start}..?from=USD&to=MXN`);
     const d = await res.json();
     const dates = Object.keys(d.rates);
-    lineChart("fxChart", dates, dates.map(k => d.rates[k].MXN), "USD/MXN");
+    const vals = dates.map(k => d.rates[k].MXN);
+    lineChart("fxChart", dates, vals, "USD/MXN");
+    // Words for screen readers (people who can't see the chart)
+    describeChart("fxChart", `USD/MXN went from ${vals[0].toFixed(3)} on ${dates[0]} to ${vals.at(-1).toFixed(3)} on ${dates.at(-1)}.`);
   } catch (err) { console.warn("FX history failed", err); }
 }
 
@@ -139,35 +145,79 @@ function lineChart(id, labels, data, name) {
   });
 }
 
+// ---------- SAFE TEXT HELPER ----------
+// Makes an HTML element and sets its words with textContent.
+// textContent always shows words as plain text, so even if outside data
+// contained sneaky code like <script>, it would just appear as letters
+// on the screen instead of running. We use this for anything from USDA.
+function el(tag, text, cls) {
+  const e = document.createElement(tag);
+  if (text !== undefined && text !== null) e.textContent = String(text);
+  if (cls) e.className = cls;
+  return e;
+}
+
+// Same look as card() above, but built safely from outside data.
+function safeCard(label, value, sub, subCls = "") {
+  const c = el("div", null, "card");
+  c.append(el("div", label, "label"), el("div", value ?? "—", "value"), el("div", sub, "sub " + subCls));
+  return c;
+}
+
 // ---------- LIVE LIVESTOCK (USDA report 1280 via our /api/livestock helper) ----------
 async function loadLivestock() {
   const summary = document.getElementById("ls-summary");
   try {
     const d = await (await fetch("/api/livestock")).json();
     if (d.error) throw new Error(d.error);
-    document.getElementById("ls-date").innerHTML =
-      `Sale date ${d.reportDate}. Source: <a href="${d.sourceUrl}" target="_blank" rel="noopener">USDA AMS Market News</a>.`;
+
+    // "Sale date ... Source: USDA AMS Market News." (link address is fixed, not from data)
+    const dateBox = document.getElementById("ls-date");
+    const link = el("a", "USDA AMS Market News");
+    link.href = "https://mymarketnews.ams.usda.gov/viewReport/1280";
+    link.target = "_blank";
+    link.rel = "noopener";
+    dateBox.replaceChildren(`Sale date ${d.reportDate}. Source: `, link, ".");
+
     // Receipts = how many head of cattle sold
     const r = d.receipts || {};
     const num = s => Number(String(s).replace(/,/g, ""));
     const diff = num(r.thisWeek) - num(r.lastWeek);
-    summary.innerHTML =
-      card("Receipts this week", r.thisWeek, "head sold") +
-      card("Last week", r.lastWeek, `<span class="${diff >= 0 ? "up" : "down"}">${diff >= 0 ? "▲" : "▼"} ${Math.abs(diff).toLocaleString()} head</span>`) +
-      card("Last year", r.lastYear, "same week") +
-      card("Report", d.reportDate, "weekly");
+    summary.replaceChildren(
+      safeCard("Receipts this week", r.thisWeek, "head sold"),
+      safeCard("Last week", r.lastWeek, `${diff >= 0 ? "▲" : "▼"} ${Math.abs(diff).toLocaleString()} head`, diff >= 0 ? "up" : "down"),
+      safeCard("Last year", r.lastYear, "same week"),
+      safeCard("Report", d.reportDate, "weekly"));
+
     // One table row per weight bucket
-    document.getElementById("ls-rows").innerHTML = d.steers.map(s =>
-      `<tr><td>${s.weight}</td><td>${s.head}</td><td>$${s.low}–$${s.high}</td><td><b>$${s.avgPrice.toFixed(2)}</b></td></tr>`).join("");
-    document.getElementById("ls-comment").innerHTML = `<b>Trend vs last week (USDA):</b> ${d.comment}`;
+    document.getElementById("ls-rows").replaceChildren(...d.steers.map(s => {
+      const tr = el("tr");
+      const avg = el("td");
+      avg.append(el("b", `$${Number(s.avgPrice).toFixed(2)}`));
+      tr.append(el("td", s.weight), el("td", s.head), el("td", `$${s.low}–$${s.high}`), avg);
+      return tr;
+    }));
+
+    // USDA's "compared to last week" comment, as plain text
+    document.getElementById("ls-comment").replaceChildren(el("b", "Trend vs last week (USDA): "), d.comment);
   } catch (err) {
-    summary.innerHTML = card("Livestock", "—", "Couldn't load the USDA report right now.");
+    summary.replaceChildren(safeCard("Livestock", "—", "Couldn't load the USDA report right now."));
     console.warn("Livestock load failed", err);
   }
+}
+
+// ---------- CHART DESCRIPTION (accessibility) ----------
+// Charts are pictures, so screen readers can't "see" them. This writes a
+// short sentence about the chart into the hidden text next to it.
+function describeChart(id, sentence) {
+  const box = document.getElementById(id + "-desc");
+  if (box) box.textContent = sentence;
 }
 
 // ---------- START EVERYTHING ----------
 renderSamples();
 lineChart("curveChart", Object.keys(curveSample), Object.values(curveSample), "Yield % (sample)");
+describeChart("curveChart", "Sample yields: " +
+  Object.entries(curveSample).map(([k, v]) => `${k} ${v}%`).join(", ") + ".");
 loadFX();
 loadLivestock();

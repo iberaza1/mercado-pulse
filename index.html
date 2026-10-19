@@ -11,14 +11,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mercado Pulse 📈 | Markets x Politics</title>
   <meta name="description" content="A fun hobby dashboard: options, FX, bank stocks, bonds, macro, micro and politics x markets." />
+  <!-- The little icon in the browser tab -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="style.css" />
-  <!-- Chart.js draws our charts. Loaded from a free CDN. -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Chart.js draws our charts. Loaded from a free CDN.
+       "integrity" is a fingerprint of the exact file we tested. If the CDN ever
+       sends a different (possibly hacked) file, the browser refuses to run it.
+       "defer" lets the page show first, then runs scripts in order. -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"
+          integrity="sha384-dug+JxfBvklEQdJ4AYuBBAIScUz0bVN73xpy273gcAwHjb3qI0fXmuYNaNfdyYJG"
+          crossorigin="anonymous"></script>
 </head>
 <body>
 
   <!-- ===== TOP NAV: tap a word to jump to that section ===== -->
-  <nav class="nav">
+  <nav class="nav" aria-label="Sections">
     <a href="#fx">FX</a><a href="#options">Options</a><a href="#banks">Banks</a>
     <a href="#bonds">Bonds</a><a href="#macro">Macro</a><a href="#micro">Micro</a><a href="#politics">Politics</a><a href="#livestock">Livestock</a>
   </nav>
@@ -38,7 +45,10 @@
       <div class="grid" id="fx-cards"><div class="card">Loading rates…</div></div>
       <div class="card chart-card">
         <h3>USD/MXN – last 30 days</h3>
-        <canvas id="fxChart"></canvas>
+        <!-- role="img" + aria-label tell screen readers this is a picture; the hidden
+             paragraph gets a sentence about the numbers from app.js -->
+        <canvas id="fxChart" role="img" aria-label="Line chart of USD/MXN over the last 30 days" aria-describedby="fxChart-desc"></canvas>
+        <p id="fxChart-desc" class="sr-only">Loading chart data…</p>
       </div>
     </section>
 
@@ -62,7 +72,8 @@
       <h2>📜 Bonds &amp; Yield Curve <span class="badge sample">SAMPLE</span></h2>
       <p class="note">Sample Treasury curve. When the 2Y yield is above the 10Y, the curve is "inverted" — often read as a recession warning.</p>
       <div class="grid" id="bond-cards"></div>
-      <div class="card chart-card"><h3>Sample yield curve</h3><canvas id="curveChart"></canvas></div>
+      <div class="card chart-card"><h3>Sample yield curve</h3><canvas id="curveChart" role="img" aria-label="Sample Treasury yield curve chart" aria-describedby="curveChart-desc"></canvas>
+        <p id="curveChart-desc" class="sr-only"></p></div>
     </section>
 
     <!-- ===== MACRO (sample) ===== -->
@@ -109,6 +120,7 @@
   </footer>
 
   <!-- Our JavaScript goes last so the page above is ready first -->
-  <script src="app.js"></script>
+  <!-- defer = run after the page is ready (and after Chart.js above) -->
+  <script defer src="app.js"></script>
 </body>
 </html>
