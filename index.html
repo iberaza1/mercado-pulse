@@ -26,7 +26,7 @@
 
   <!-- ===== TOP NAV: tap a word to jump to that section ===== -->
   <nav class="nav" aria-label="Sections">
-    <a href="#fx">FX</a><a href="#options">Options</a><a href="#banks">Banks</a>
+    <a href="#fx">FX</a><a href="#options">Options</a><a href="#banks">Banks</a><a href="#rates">Bank Rates</a>
     <a href="#bonds">Bonds</a><a href="#macro">Macro</a><a href="#micro">Micro</a><a href="#politics">Politics</a><a href="#livestock">Livestock</a>
   </nav>
 
@@ -65,6 +65,33 @@
       <h2>🏦 Banking Stocks <span class="badge sample">SAMPLE</span></h2>
       <p class="note">Practice numbers. KBE = big + mid US banks ETF, KRE = regional banks ETF.</p>
       <div class="grid" id="bank-cards"></div>
+    </section>
+
+    <!-- ===== BANK RATES: hand-checked table (data/rates.json) + LIVE FDIC averages (api/fdic-rates.js) ===== -->
+    <section id="rates" class="section">
+      <h2>💵 Bank Rates <span class="badge hand">UPDATED BY HAND</span></h2>
+      <p class="note">ROGER Bank vs fintechs, big banks and OKC locals. <span id="rates-asof"></span></p>
+      <h3 class="mini">U.S. national averages <span class="badge live">LIVE</span> <span class="small muted" id="fdic-src"></span></h3>
+      <div class="grid" id="fdic-cards"><div class="card">Loading FDIC national rates…</div></div>
+      <div class="card">
+        <div class="filters" role="group" aria-label="Account type">
+          <button type="button" class="chip on" data-type="All">All</button>
+          <button type="button" class="chip" data-type="Checking">Checking</button>
+          <button type="button" class="chip" data-type="Savings">Savings</button>
+          <button type="button" class="chip" data-type="Money Market">Money Market</button>
+          <button type="button" class="chip" data-type="CD">CDs</button>
+        </div>
+        <div class="filters" role="group" aria-label="Audience">
+          <button type="button" class="chip on" data-aud="All">Everyone</button>
+          <button type="button" class="chip" data-aud="Business">Business</button>
+          <button type="button" class="chip" data-aud="Consumer">Consumer</button>
+        </div>
+        <table class="rates-table">
+          <thead><tr><th>Bank</th><th>Product</th><th>APY</th><th>vs national avg</th><th>Details</th></tr></thead>
+          <tbody id="rates-rows"><tr><td colspan="5">Loading rates…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="note small">Rates change often. Always check with the bank before opening an account. Not financial advice. Treasury/money-market fund yields (like Mercury Treasury) are investments, not FDIC-insured deposits. "vs national avg" compares to the FDIC national average for the same account type.</p>
     </section>
 
     <!-- ===== BONDS (sample) ===== -->
