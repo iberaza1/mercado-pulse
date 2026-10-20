@@ -206,6 +206,91 @@ async function loadLivestock() {
   }
 }
 
+// ---------- BANK RATES (hand-checked data/rates.json + LIVE FDIC averages) ----------
+let rateRows = [], fdic = null, rateFilter = { type: "All", aud: "All" };
+
+// Which FDIC national average matches this row? (null = no fair match)
+function nationalAvg(row) {
+  if (!fdic || !fdic.rates) return null;
+  const r = fdic.rates;
+  if (row.type === "Checking") return r.checking ?? null;
+  if (row.type === "Savings") return r.savings ?? null;
+  if (row.type === "Money Market") return r.moneyMarket ?? null;
+  if (row.type === "CD" && r.cd && row.termMonths) return r.cd[String(row.termMonths)] ?? null;
+  return null; // e.g. Treasury funds are not deposits, so no comparison
+}
+
+function renderRates() {
+  const body = document.getElementById("rates-rows");
+  const rows = rateRows.filter(r =>
+    (rateFilter.type === "All" || r.type === rateFilter.type) &&
+    (rateFilter.aud === "All" || r.audience === rateFilter.aud));
+  if (!rows.length) { const tr = el("tr"); const td = el("td", "No rows for this filter yet."); td.colSpan = 5; tr.append(td); return body.replaceChildren(tr); }
+  body.replaceChildren(...rows.map(r => {
+    const tr = el("tr", null, r.highlight ? "roger" : "");
+    const bank = el("td"); bank.dataset.label = "Bank";
+    bank.append(el("b", r.institution), el("br"), el("span", r.category, "tag"), el("span", r.audience, "tag"));
+    const prod = el("td", r.product + (r.term ? ` · ${r.term}` : "")); prod.dataset.label = "Product";
+    const isNum = typeof r.apy === "number";
+    const upTo = isNum && /^up to/i.test(r.apyNote || "") ? "up to " : isNum && /^from/i.test(r.apyNote || "") ? "from " : "";
+    const apy = el("td", isNum ? `${upTo}${r.apy.toFixed(2)}%` : (r.apyNote && /not offered/i.test(r.apyNote) ? "Not offered" : "Check site"), "apy");
+    apy.dataset.label = "APY";
+    if (r.type === "Treasury" && isNum) apy.textContent += " yield";
+    const avg = nationalAvg(r);
+    const cmp = el("td", isNum && avg ? `${(r.apy / avg).toFixed(1)}× national avg (${avg.toFixed(2)}%)` : "—");
+    cmp.dataset.label = "vs national avg";
+    const det = el("td", null, "detail"); det.dataset.label = "Details";
+    if (r.apyNote && !/^not offered$/i.test(r.apyNote)) det.append(el("div", r.apyNote));
+    const a = el("a", `Source · as of ${r.asOf}`);
+    if (/^https:\/\//.test(r.sourceUrl)) { a.href = r.sourceUrl; a.target = "_blank"; a.rel = "noopener"; }
+    det.append(a);
+    tr.append(bank, prod, apy, cmp, det);
+    return tr;
+  }));
+}
+
+function setupRateFilters() {
+  document.querySelectorAll("#rates .chip").forEach(btn => btn.addEventListener("click", () => {
+    const key = btn.dataset.type ? "type" : "aud";
+    rateFilter[key] = btn.dataset[key];
+    btn.parentElement.querySelectorAll(".chip").forEach(b => b.classList.toggle("on", b === btn));
+    renderRates();
+  }));
+}
+
+async function loadRates() {
+  setupRateFilters();
+  try {
+    const d = await (await fetch("data/rates.json")).json();
+    rateRows = d.rows || [];
+    document.getElementById("rates-asof").textContent = `Table checked by hand · as of ${d.asOf}.`;
+    renderRates();
+  } catch (err) {
+    const tr = el("tr"), td = el("td", "Couldn't load the rates table right now."); td.colSpan = 5; tr.append(td);
+    document.getElementById("rates-rows").replaceChildren(tr);
+    console.warn("Rates load failed", err);
+  }
+  const cards = document.getElementById("fdic-cards");
+  try {
+    const d = await (await fetch("/api/fdic-rates")).json();
+    if (d.error) throw new Error(d.error);
+    fdic = d;
+    const r = d.rates, pct = v => (typeof v === "number" ? `${v.toFixed(2)}%` : "—");
+    const list = [["Savings", r.savings, "national avg APY"], ["Interest checking", r.checking, "national avg APY"],
+      ["Money market", r.moneyMarket, "national avg APY"], ["12-month CD", r.cd && r.cd["12"], "national avg APY"]]
+      .filter(x => typeof x[1] === "number");
+    cards.replaceChildren(...list.map(([l, v, s]) => safeCard(l, pct(v), s)));
+    const src = document.getElementById("fdic-src");
+    const link = el("a", d.source); link.href = d.fallback ? "https://fred.stlouisfed.org/series/SNDR" : "https://www.fdic.gov/national-rates-and-rate-caps";
+    link.target = "_blank"; link.rel = "noopener";
+    src.replaceChildren("Source: ", link, ` · ${d.asOf || ""}`);
+    renderRates(); // now with "× national avg"
+  } catch (err) {
+    cards.replaceChildren(safeCard("National averages", "—", "Couldn't load FDIC rates right now."));
+    console.warn("FDIC load failed", err);
+  }
+}
+
 // ---------- CHART DESCRIPTION (accessibility) ----------
 // Charts are pictures, so screen readers can't "see" them. This writes a
 // short sentence about the chart into the hidden text next to it.
@@ -221,3 +306,4 @@ describeChart("curveChart", "Sample yields: " +
   Object.entries(curveSample).map(([k, v]) => `${k} ${v}%`).join(", ") + ".");
 loadFX();
 loadLivestock();
+loadRates();
